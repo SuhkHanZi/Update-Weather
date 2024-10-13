@@ -3,7 +3,7 @@ let button = document.getElementById("button");
 let name = document.getElementById("name");
 let temprature = document.getElementById("temprature");
 let florImg = document.getElementById("florImg");
-let date = document.getElementById("date")
+let date = document.getElementById("date");
 // Timing Selection Start Here
 // 1
 let time = document.getElementById("time");
@@ -63,15 +63,19 @@ let thuTemp = document.getElementById("thuTemp");
 let friImg = document.getElementById("friImg");
 let fritxt = document.getElementById("fritxt");
 let friTemp = document.getElementById("friTemp");
-button.addEventListener("click", fetchWeatherData);
-button.addEventListener("touchstart", fetchWeatherData);
-function fetchWeatherData() {
-    // Get the value from the input for the location
-    const location = inp.value; // Get location from the input
 
-    // Check if location is provided
+// Detect if the device is mobile (optional, but useful for different behaviors)
+const isMobile = 'ontouchstart' in window || navigator.msMaxTouchPoints;
+
+button.addEventListener(isMobile ? "touchstart" : "click", fetchWeatherData);
+
+function fetchWeatherData(event) {
+    // Prevents triggering the function twice for touch devices
+    event.preventDefault();
+
+    const location = inp.value; // Get location from the input
     if (!location) {
-        console.error("Please enter a location.");
+        alert("Please enter a location.");
         return;
     }
 
@@ -85,23 +89,22 @@ function fetchWeatherData() {
         })
         .then((result) => {
             console.log(result); // Log the result to the console
-            // You can now update the UI with the fetched data
+
+            // Update UI elements with weather data
             name.textContent = result.location.name.toUpperCase();
             temprature.textContent = `${result.current.temp_c}°`;
             florImg.src = "https:" + result.current.condition.icon;
-            date.textContent = result.location.
-                localtime;
+            date.textContent = result.location.localtime;
 
-
-            // Update times and images for specific forecast hours
-            time.textContent = result.forecast.forecastday[0].astro.sunrise;
+            // Update hourly forecast images and times
             img1.src = "https:" + result.forecast.forecastday[0].hour[9].condition.icon;
             img2.src = "https:" + result.forecast.forecastday[0].hour[11].condition.icon;
             img3.src = "https:" + result.forecast.forecastday[0].hour[14].condition.icon;
             img4.src = "https:" + result.forecast.forecastday[0].hour[17].condition.icon;
             img5.src = "https:" + result.forecast.forecastday[0].hour[20].condition.icon;
             img6.src = "https:" + result.forecast.forecastday[0].hour[23].condition.icon;
-            // time
+
+            // Update times
             time.textContent = result.forecast.forecastday[0].hour[9].time.split(" ")[1];
             time2.textContent = result.forecast.forecastday[0].hour[11].time.split(" ")[1];
             time3.textContent = result.forecast.forecastday[0].hour[14].time.split(" ")[1];
@@ -109,7 +112,7 @@ function fetchWeatherData() {
             time5.textContent = result.forecast.forecastday[0].hour[20].time.split(" ")[1];
             time6.textContent = result.forecast.forecastday[0].hour[23].time.split(" ")[1];
 
-            // Update temperatures for those hours
+            // Update temperatures for those times
             firstTemp.textContent = `${result.forecast.forecastday[0].hour[9].temp_c}°`;
             secTemp.textContent = `${result.forecast.forecastday[0].hour[11].temp_c}°`;
             thrdTemp.textContent = `${result.forecast.forecastday[0].hour[14].temp_c}°`;
@@ -117,12 +120,13 @@ function fetchWeatherData() {
             fivTemp.textContent = `${result.forecast.forecastday[0].hour[20].temp_c}°`;
             sixTemp.textContent = `${result.forecast.forecastday[0].hour[23].temp_c}°`;
 
+            // Update current conditions
             realFeel.textContent = `${result.current.feelslike_c}°`;
             uvIndex.textContent = `${result.current.uv}`;
             visibility.textContent = `${result.current.vis_km}KM`;
             Wind.textContent = `${result.current.wind_kph}km/h`;
 
-            // 10-day forecast logic (corrected for multiple days)
+            // Update 10-day forecast
             prevImgone.src = "https:" + result.forecast.forecastday[0].day.condition.icon;
             firtxt.textContent = result.forecast.forecastday[0].day.condition.text;
             todTemp.textContent = `${result.forecast.forecastday[0].day.avgtemp_c}°`;
@@ -147,11 +151,4 @@ function fetchWeatherData() {
             thutxt.textContent = result.forecast.forecastday[5].day.condition.text;
             thuTemp.textContent = `${result.forecast.forecastday[5].day.avgtemp_c}°`;
 
-            friImg.src = "https:" + result.forecast.forecastday[6].day.condition.icon;
-            fritxt.textContent = result.forecast.forecastday[6].day.condition.text;
-            friTemp.textContent = `${result.forecast.forecastday[6].day.avgtemp_c}°`;
-        })
-        .catch((error) => {
-            console.error("Error fetching the weather data:", error);
-        });
-};
+            friImg.src = "https:" + result.forecast
